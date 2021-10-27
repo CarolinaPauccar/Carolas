@@ -5,9 +5,11 @@ import Image from 'next/image';
 import Layout from '../components/Layout';
 import { Store } from '../utils/Store';
 import { Typography, Grid, TableContainer, TableHead, TableRow, TableCell, Table, TableBody, Link, Select, MenuItem, Button, Card, ListItem, List } from '@material-ui/core';
-import { Axios } from 'axios';
+import Axios from 'axios';
+import { useRouter } from 'next/dist/client/router';
 
 function CartScreen() {
+    const router = useRouter();
     const { state, dispatch } = useContext(Store);
     const { cart: { cartItems }} = state;
 
@@ -19,6 +21,7 @@ function CartScreen() {
         }
         dispatch({ type: 'CART_ADD_ITEM', payload: { ...item, quantity } });
     };
+    
     return (
         <Layout title="Shopping Cart">
             <Typography component="h1" variant="h1">
@@ -26,7 +29,9 @@ function CartScreen() {
             </Typography>
                 {cartItems.length === 0 ? (
                     <div>
-                        Cart is empty. <NextLink href="/">Go shopping</NextLink>
+                        Cart is empty. <NextLink href="/" passHref>
+                            <Link>Go shopping</Link>
+                            </NextLink>
                     </div>
                 ) : (
                     <Grid container spacing={1}>
@@ -70,7 +75,7 @@ function CartScreen() {
                                                         onChange={(e)=>
                                                             updateCartHandler(item, e.target.value)}>
                                                         {[...Array(item.countInStock).keys()].map((x) => (
-                                                            <MenuItem key={x + 1} value={x +1}>
+                                                            <MenuItem key={x + 1} value={x + 1}>
                                                                 {x + 1}
                                                             </MenuItem>
                                                         ))}
@@ -80,7 +85,7 @@ function CartScreen() {
                                                     ${item.price}
                                                 </TableCell>
                                                 <TableCell align="right">
-                                                    <Button variant="contained" color="secondary">
+                                                    <Button variant="contained" color="danger" onClick={(item)=> {dispatch({ type: 'CART_REMOVE_ITEM', payload: item });}}>
                                                         X
                                                     </Button>
                                                 </TableCell>
@@ -100,7 +105,12 @@ function CartScreen() {
                                         </Typography>
                                     </ListItem>
                                     <ListItem>
-                                        <Button variant="contained" color="primary" fullWidth>
+                                        <Button 
+                                            onClick={() => router.push('/shipping')} 
+                                            variant="contained" 
+                                            color="primary" 
+                                            fullWidth
+                                        >
                                             Check Out
                                         </Button>
                                     </ListItem>
